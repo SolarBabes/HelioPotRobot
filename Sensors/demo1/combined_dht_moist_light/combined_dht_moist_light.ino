@@ -42,6 +42,17 @@ DHT dht(DHT_PIN, DHTTYPE);
 int   lightVal[4]   = {0};
 float tempHumVal[2] = {0}; 
 int   moistVal      = 0;
+int avgLightCurrent = 0;
+int currentMinLight = 0;
+int currentMaxLight = 0;
+int minLight = 0;
+int minTemp  = 0;
+int minHumid = 0;
+int minMoist = 0;
+int maxLight = 0;
+int maxTemp  = 0;
+int maxHumid = 0;
+int maxMoist = 0;
 
 void setup() 
 {
@@ -53,6 +64,10 @@ void setup()
 
 void loop() 
 {    
+  
+  //PRINT LIVE READINGS
+  Serial.println("LIVE READINGS");
+  Serial.println("=============");
     // Print light readings
     //this sensor's 5V max is 1000lux!
     //so we map from 0-1023 raw to 0-1000 lux.
@@ -60,7 +75,6 @@ void loop()
     lightVal[1] = analogRead(LIGHT_1_PIN);
     lightVal[2] = analogRead(LIGHT_2_PIN);
     lightVal[3] = analogRead(LIGHT_3_PIN);
-    
     for (int i=0; i<4; i++) {
       lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
       Serial.print("Light ");
@@ -69,13 +83,7 @@ void loop()
       Serial.print(lightVal[i]);
       Serial.print(" lux\t");
     }
-    
-    /*
-    light0Val = map(light0Val, 0, 1023, 0, 1000);
-    Serial.print("Light 0: ");
-    Serial.print(light0Val, DEC);
-    Serial.println(" lux");
-    */
+    Serial.println();
     
     // Print temp & humidity readings
     if(!dht.readTempAndHumidity(tempHumVal)) {
@@ -88,8 +96,7 @@ void loop()
     } else {
        Serial.println("Failed to get temperature and humidity value.");
     }
-    
-    
+
     // Print moisture readings
     //   Reading temperature or humidity takes about 250 milliseconds!
     //   Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
@@ -115,8 +122,30 @@ void loop()
     } else if (825 <= moistVal && moistVal < 950) {
       Serial.println(" ~ Pretty much just water.");
     }
+  Serial.println();
 
-    // Delay and newline for readability
+  //PRINT CURRENT AVG LIGHT
+  Serial.println("CURRENT LIGHT AVERAGE");
+  Serial.println("=====================");
+  avgLightCurrent = (lightVal[0] + lightVal[1] + lightVal[2] + lightVal[3]) / 4;
+  Serial.print(avgLightCurrent);
+  Serial.println(" lux");
+  
+  
+  //PRINT RUNNING MIN AND MAX
+  /*
+  Serial.println("MIN AND MAX");
+  Serial.println("===========");
+  currentMinLight = min(lightVal[0], min(lightVal[1], min(lightVal[2], lightVal[3])));
+  currentMaxLight = max(lightVal[0], max(lightVal[1], max(lightVal[2], lightVal[3])));
+  //minTemp  =  
+  //minHumid = 
+  //minMoist = 
+  */
+  
+    // Delay and newlines for readability
+    Serial.println();
+    Serial.println();
     Serial.println();
     delay(1000);
    
