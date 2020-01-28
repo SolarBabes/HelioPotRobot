@@ -28,23 +28,20 @@
 
 //==============
 // PIN NUMBERS
-//==============
-#define LIGHT_0_PIN  A0   // light sensor 0
-#define LIGHT_1_PIN  A1   // light sensor 1
-#define LIGHT_2_PIN  A2   // light sensor 2
-#define LIGHT_3_PIN  A3   // light sensor 3
-#define DHT_PIN      4    // temperature and humidity sensor
-#define MOIST_PIN    A5   // moisture sensor
+//==============          // SENSOR                  // RIBBON COLOUR    
+#define LIGHT_0_PIN  A0   // light sensor 0          // brown
+#define LIGHT_1_PIN  A1   // light sensor 1          // red
+#define LIGHT_2_PIN  A2   // light sensor 2          // orange
+#define LIGHT_3_PIN  A3   // light sensor 3          // yellow
+#define DHT_PIN      4    // temp & humidity sensor  // green
+#define MOIST_PIN    A5   // moisture sensor         // blue
 
 #define DHTTYPE DHT11   // DHT 11
 DHT dht(DHT_PIN, DHTTYPE);
 
-int   light0Val     = 0;
-int   light1Val     = 0;
-int   light2Val     = 0;
-int   light3Val     = 0;
+int   lightVal[4]   = {0};
 float tempHumVal[2] = {0}; 
-int   moistVal       = 0;
+int   moistVal      = 0;
 
 void setup() 
 {
@@ -57,13 +54,28 @@ void setup()
 void loop() 
 {    
     // Print light readings
-    light0Val = analogRead(LIGHT_0_PIN);
     //this sensor's 5V max is 1000lux!
     //so we map from 0-1023 raw to 0-1000 lux.
+    lightVal[0] = analogRead(LIGHT_0_PIN);
+    lightVal[1] = analogRead(LIGHT_1_PIN);
+    lightVal[2] = analogRead(LIGHT_2_PIN);
+    lightVal[3] = analogRead(LIGHT_3_PIN);
+    
+    for (int i=0; i<4; i++) {
+      lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
+      Serial.print("Light ");
+      Serial.print(i);
+      Serial.print(": ");
+      Serial.print(lightVal[i]);
+      Serial.print(" lux\t");
+    }
+    
+    /*
     light0Val = map(light0Val, 0, 1023, 0, 1000);
-    Serial.print("Light: ");
+    Serial.print("Light 0: ");
     Serial.print(light0Val, DEC);
     Serial.println(" lux");
+    */
     
     // Print temp & humidity readings
     if(!dht.readTempAndHumidity(tempHumVal)) {
