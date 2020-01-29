@@ -22,10 +22,9 @@
 // !! The current Uno we have has weird A4 and sometimes (??) A5 pins!!
 //   If they don't work, try another pin.
 // ===============================================================================
-
+#include <SeeedOLED.h>
 #include "DHT.h"
 #include "Wire.h"
-
 //==============
 // PIN NUMBERS
 //==============          // SENSOR                  // RIBBON COLOUR    
@@ -56,10 +55,14 @@ int maxMoist = 0;
 
 void setup() 
 {
+    Wire.begin();
+    SeeedOled.init();  //initialze SEEED OLED display
+
     Serial.begin(9600);
     Serial.println("DHT11 test!");
     Wire.begin();
     dht.begin();
+    
 }
 
 void loop() 
@@ -142,7 +145,20 @@ void loop()
   //minHumid = 
   //minMoist = 
   */
-  
+     // SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
+    SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
+    SeeedOled.setPageMode();           //Set addressing mode to Page Mode
+    SeeedOled.setTextXY(0, 0);         //Set the cursor to Xth Page, Yth Column
+    SeeedOled.putString("Light: ");
+    SeeedOled.putNumber(avgLightCurrent); //Print the String
+    SeeedOled.putString("   lux");
+    SeeedOled.setTextXY(1, 0);
+
+    SeeedOled.putString("\n");
+    SeeedOled.putString("Temp: ");
+    SeeedOled.putNumber(tempHumVal[1]); //Print the String
+    
+
     // Delay and newlines for readability
     Serial.println();
     Serial.println();
