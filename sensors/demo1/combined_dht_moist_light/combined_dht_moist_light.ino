@@ -37,13 +37,15 @@
 #define LIGHT_2_PIN  A2   // light sensor 2          // orange
 #define LIGHT_3_PIN  A3   // light sensor 3          // yellow
 #define DHT_PIN      4    // temp & humidity sensor  // green
-#define MOIST_PIN    A5   // moisture sensor         // blue
+#define MOIST_PIN    A5   // moisture sensor         // blue      //<-- this boy likes to draw a whole lot of current
 
 #define DHTTYPE DHT11   // DHT 11
 DHT dht(DHT_PIN, DHTTYPE);
 
-int   lightVal[4]   = {0};
-float tempHumVal[2] = {0}; 
+int   lightVal[4]   = {
+  0};
+float tempHumVal[2] = {
+  0}; 
 int   moistVal      = 0;
 int avgLightCurrent = 0;
 int currentMinLight = 0;
@@ -59,76 +61,83 @@ int maxMoist = 0;
 
 void setup() 
 {
-    Wire.begin();
-    SeeedOled.init();  //initialze SEEED OLED display
+  Wire.begin();
+  SeeedOled.init();  //initialze SEEED OLED display
+  SeeedOled.clearDisplay();
+  Serial.begin(9600);
+  Serial.println("\n<--SERIAL READY-->\n");
+  Wire.begin();
+  dht.begin();
 
-    Serial.begin(9600);
-    Serial.println("DHT11 test!");
-    Wire.begin();
-    dht.begin();
-    
 }
 
 void loop() 
 {    
-  
+
   //PRINT LIVE READINGS
   Serial.println("LIVE READINGS");
   Serial.println("=============");
-    // Print light readings
-    //this sensor's 5V max is 1000lux!
-    //so we map from 0-1023 raw to 0-1000 lux.
-    lightVal[0] = analogRead(LIGHT_0_PIN);
-    lightVal[1] = analogRead(LIGHT_1_PIN);
-    lightVal[2] = analogRead(LIGHT_2_PIN);
-    lightVal[3] = analogRead(LIGHT_3_PIN);
-    for (int i=0; i<4; i++) {
-      lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
-      Serial.print("Light ");
-      Serial.print(i);
-      Serial.print(": ");
-      Serial.print(lightVal[i]);
-      Serial.print(" lux\t");
-    }
-    Serial.println();
-    
-    // Print temp & humidity readings
-    if(!dht.readTempAndHumidity(tempHumVal)) {
-        Serial.print("Humidity: "); 
-        Serial.print(tempHumVal[0]);
-        Serial.print(" %\t");
-        Serial.print("Temperature: "); 
-        Serial.print(tempHumVal[1]);
-        Serial.println(" *C");
-    } else {
-       Serial.println("Failed to get temperature and humidity value.");
-    }
+  // Print light readings
+  //this sensor's 5V max is 1000lux!
+  //so we map from 0-1023 raw to 0-1000 lux.
+  lightVal[0] = analogRead(LIGHT_0_PIN);
+  lightVal[1] = analogRead(LIGHT_1_PIN);
+  lightVal[2] = analogRead(LIGHT_2_PIN);
+  lightVal[3] = analogRead(LIGHT_3_PIN);
+  for (int i=0; i<4; i++) {
+    lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
+    Serial.print("Light ");
+    Serial.print(i);
+    Serial.print(": ");
+    Serial.print(lightVal[i]);
+    Serial.print(" lux\t");
+  }
+  Serial.println();
 
-    // Print moisture readings
-    //   Reading temperature or humidity takes about 250 milliseconds!
-    //   Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-    //  "It is just a value reflect the humidity of soil.We do not standardization.Regards." -Grove FAQ admin
-    //     0-300 dry soil
-    //   300-700 humid soil
-    //   700-950 water
-    moistVal = analogRead(MOIST_PIN);
-    Serial.print("Moisture: ");
-    Serial.print(moistVal);
-    if (0 <= moistVal && moistVal <150) {
-      Serial.println(" ~ Very dry!");
-    } else if (150 <= moistVal && moistVal < 300) {
-      Serial.println(" ~ Quite dry.");
-    } else if (300 <= moistVal && moistVal < 450) {
-      Serial.println(" ~ A bit moist.");
-    } else if (450 <= moistVal && moistVal < 600) {
-      Serial.println(" ~ Quite moist.");
-    } else if (600 <= moistVal && moistVal < 700) {
-      Serial.println(" ~ Very moist!");
-    } else if (700 <= moistVal && moistVal < 825) {
-      Serial.println(" ~ Very moist!");
-    } else if (825 <= moistVal && moistVal < 950) {
-      Serial.println(" ~ Pretty much just water.");
-    }
+  // Print temp & humidity readings
+  if(!dht.readTempAndHumidity(tempHumVal)) {
+    Serial.print("Humidity: "); 
+    Serial.print(tempHumVal[0]);
+    Serial.print(" %\t");
+    Serial.print("Temperature: "); 
+    Serial.print(tempHumVal[1]);
+    Serial.println(" *C");
+  } 
+  else {
+    Serial.println("Failed to get temperature and humidity value.");
+  }
+
+  // Print moisture readings
+  //   Reading temperature or humidity takes about 250 milliseconds!
+  //   Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+  //  "It is just a value reflect the humidity of soil.We do not standardization.Regards." -Grove FAQ admin
+  //     0-300 dry soil
+  //   300-700 humid soil
+  //   700-950 water
+  moistVal = analogRead(MOIST_PIN);
+  Serial.print("Moisture: ");
+  Serial.print(moistVal);
+  if (0 <= moistVal && moistVal <150) {
+    Serial.println(" ~ Very dry!");
+  } 
+  else if (150 <= moistVal && moistVal < 300) {
+    Serial.println(" ~ Quite dry.");
+  } 
+  else if (300 <= moistVal && moistVal < 450) {
+    Serial.println(" ~ A bit moist.");
+  } 
+  else if (450 <= moistVal && moistVal < 600) {
+    Serial.println(" ~ Quite moist.");
+  } 
+  else if (600 <= moistVal && moistVal < 700) {
+    Serial.println(" ~ Very moist!");
+  } 
+  else if (700 <= moistVal && moistVal < 825) {
+    Serial.println(" ~ Very moist!");
+  } 
+  else if (825 <= moistVal && moistVal < 950) {
+    Serial.println(" ~ Pretty much just water.");
+  }
   Serial.println();
 
   //PRINT CURRENT AVG LIGHT
@@ -137,36 +146,43 @@ void loop()
   avgLightCurrent = (lightVal[0] + lightVal[1] + lightVal[2] + lightVal[3]) / 4;
   Serial.print(avgLightCurrent);
   Serial.println(" lux");
-  
-  
+
+
   //PRINT RUNNING MIN AND MAX
   /*
   Serial.println("MIN AND MAX");
-  Serial.println("===========");
-  currentMinLight = min(lightVal[0], min(lightVal[1], min(lightVal[2], lightVal[3])));
-  currentMaxLight = max(lightVal[0], max(lightVal[1], max(lightVal[2], lightVal[3])));
-  //minTemp  =  
-  //minHumid = 
-  //minMoist = 
-  */
-     // SeeedOled.clearDisplay();          //clear the screen and set start position to top left corner
-    SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
-    SeeedOled.setPageMode();           //Set addressing mode to Page Mode
-    SeeedOled.setTextXY(0, 0);         //Set the cursor to Xth Page, Yth Column
-    SeeedOled.putString("Light: ");
-    SeeedOled.putNumber(avgLightCurrent); //Print the String
-    SeeedOled.putString("   lux");
-    SeeedOled.setTextXY(1, 0);
+   Serial.println("===========");
+   currentMinLight = min(lightVal[0], min(lightVal[1], min(lightVal[2], lightVal[3])));
+   currentMaxLight = max(lightVal[0], max(lightVal[1], max(lightVal[2], lightVal[3])));
+   //minTemp  =  
+   //minHumid = 
+   //minMoist = 
+   */
 
-    SeeedOled.putString("\n");
-    SeeedOled.putString("Temp: ");
-    SeeedOled.putNumber(tempHumVal[1]); //Print the String
-    
+  //PRINT TO OLED DISPLAY
+  SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
+  SeeedOled.setPageMode();           //Set addressing mode to Page Mode
+  SeeedOled.setTextXY(0, 0);         //Set the cursor to Xth Page, Yth Column
+  SeeedOled.putString("Light: ");
+  SeeedOled.putNumber(avgLightCurrent); //Print the String
+  SeeedOled.putString("   lux");
 
-    // Delay and newlines for readability
-    Serial.println();
-    Serial.println();
-    Serial.println();
-    delay(1000);
-   
+  SeeedOled.setTextXY(1, 0);
+  SeeedOled.putString("\n");
+  SeeedOled.putString("Temp: ");
+  SeeedOled.putNumber(tempHumVal[1]); //Print the String
+  
+  SeeedOled.setTextXY(2, -1);
+  SeeedOled.putString("\n");
+  SeeedOled.putString("Humid: ");
+  SeeedOled.putNumber(tempHumVal[0]); //Print the String
+
+
+  // Delay and newlines for readability
+  Serial.println();
+  Serial.println();
+  Serial.println();
+  delay(1000);
+
 }
+
