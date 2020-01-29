@@ -11,6 +11,8 @@
 //  light sensor readings.
 //  This means that this code is only functional for demo 1 and will need major
 //  restructuring for demo 2 and onwards.
+//  The OpenCR board serial output is seen by the Rpi in its /dev
+//  The OpenCR board can run Arduino code and has the same headers on top as Uno
 // ===============================================================================
 // DHT portion originally written by ladyada, public domain
 // Modified and extended by SolarBabes
@@ -22,9 +24,11 @@
 // !! The current Uno we have has weird A4 and sometimes (??) A5 pins!!
 //   If they don't work, try another pin.
 // ===============================================================================
+
 #include <SeeedOLED.h>
 #include "DHT.h"
 #include "Wire.h"
+
 //==============
 // PIN NUMBERS
 //==============          // SENSOR                  // RIBBON COLOUR    
