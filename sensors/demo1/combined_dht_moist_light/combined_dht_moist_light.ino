@@ -90,7 +90,7 @@ void loop()
     Serial.print(i);
     Serial.print(": ");
     Serial.print(lightVal[i]);
-    Serial.print(" lux\t");
+    Serial.print(" lux\t"); 
   }
   Serial.println();
 
@@ -150,14 +150,30 @@ void loop()
 
   //PRINT RUNNING MIN AND MAX
   /*
-  Serial.println("MIN AND MAX");
-   Serial.println("===========");
-   currentMinLight = min(lightVal[0], min(lightVal[1], min(lightVal[2], lightVal[3])));
-   currentMaxLight = max(lightVal[0], max(lightVal[1], max(lightVal[2], lightVal[3])));
-   //minTemp  =  
-   //minHumid = 
-   //minMoist = 
-   */
+  Serial.println("RUNNING MIN AND MAX");
+  Serial.println("===================");
+  currentMinLight = min(lightVal[0], min(lightVal[1], min(lightVal[2], lightVal[3])));
+  currentMaxLight = max(lightVal[0], max(lightVal[1], max(lightVal[2], lightVal[3])));
+  
+  if (currentMinLight < minLight) {
+    minLight = currentMinLight;
+  }
+  Serial.print("Minimum light: ");
+  Serial.println(minLight);
+  if (currentMaxLight < maxLight) {
+    maxLight = currentMaxLight;
+  }
+  
+  if (tempHumVal[1] < minTemp) {
+    minTemp = tempHumVal[1];
+  }
+  if (tempHumVal[0] < minHumid ) {
+    minHumid = tempHumVal[0];
+  }
+  if (moistVal < minMoist) {
+    minMoist = moistVal;
+  }
+*/
 
   //PRINT TO OLED DISPLAY
   SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
