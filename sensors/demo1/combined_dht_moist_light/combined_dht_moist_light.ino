@@ -32,20 +32,18 @@
 //==============
 // PIN NUMBERS
 //==============          // SENSOR                  // RIBBON COLOUR    
-#define LIGHT_0_PIN  A0   // light sensor 0          // brown
-#define LIGHT_1_PIN  A1   // light sensor 1          // red
-#define LIGHT_2_PIN  A2   // light sensor 2          // orange
-#define LIGHT_3_PIN  A3   // light sensor 3          // yellow
-#define DHT_PIN      4    // temp & humidity sensor  // green
-#define MOIST_PIN    A5   // moisture sensor         // blue      //<-- this boy likes to draw a whole lot of current
+#define LIGHT_0_PIN  A0   // light sensor 0          // red
+#define LIGHT_1_PIN  A1   // light sensor 1          // orange
+#define LIGHT_2_PIN  A2   // light sensor 2          // yellow
+//#define LIGHT_3_PIN  A5   // light sensor 3          // green        // removed for demo 1!
+#define DHT_PIN      4    // temp & humidity sensor  // blue
+#define MOIST_PIN    A3   // moisture sensor         // purple      //<-- this boy likes to draw a whole lot of current
 
 #define DHTTYPE DHT11   // DHT 11
 DHT dht(DHT_PIN, DHTTYPE);
 
-int   lightVal[4]   = {
-  0};
-float tempHumVal[2] = {
-  0}; 
+int   lightVal[3]   = {0};
+float tempHumVal[2] = {0}; 
 int   moistVal      = 0;
 int avgLightCurrent = 0;
 int currentMinLight = 0;
@@ -83,8 +81,8 @@ void loop()
   lightVal[0] = analogRead(LIGHT_0_PIN);
   lightVal[1] = analogRead(LIGHT_1_PIN);
   lightVal[2] = analogRead(LIGHT_2_PIN);
-  lightVal[3] = analogRead(LIGHT_3_PIN);
-  for (int i=0; i<4; i++) {
+//  lightVal[3] = analogRead(LIGHT_3_PIN);
+  for (int i=0; i<3; i++) {
     lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
     Serial.print("Light ");
     Serial.print(i);
@@ -143,7 +141,7 @@ void loop()
   //PRINT CURRENT AVG LIGHT
   Serial.println("CURRENT LIGHT AVERAGE");
   Serial.println("=====================");
-  avgLightCurrent = (lightVal[0] + lightVal[1] + lightVal[2] + lightVal[3]) / 4;
+  avgLightCurrent = (lightVal[0] + lightVal[1] + lightVal[2]/* + lightVal[3]*/) / 3;
   Serial.print(avgLightCurrent);
   Serial.println(" lux");
 
