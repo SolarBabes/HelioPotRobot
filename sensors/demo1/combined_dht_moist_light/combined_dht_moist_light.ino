@@ -88,7 +88,7 @@ void loop()
     Serial.print(i);
     Serial.print(": ");
     Serial.print(lightVal[i]);
-    Serial.print(" lux\t"); 
+    Serial.print(" lux\t\t"); 
   }
   Serial.println();
 
@@ -179,18 +179,26 @@ void loop()
   SeeedOled.setTextXY(0, 0);         //Set the cursor to Xth Page, Yth Column
   SeeedOled.putString("Light: ");
   SeeedOled.putNumber(avgLightCurrent); //Print the String
-  SeeedOled.putString("   lux");
+  SeeedOled.putString("\tlux ");
 
   SeeedOled.setTextXY(1, 0);
   SeeedOled.putString("\n");
   SeeedOled.putString("Temp: ");
   SeeedOled.putNumber(tempHumVal[1]); //Print the String
+  SeeedOled.putString("\tC");
   
   SeeedOled.setTextXY(2, -1);
   SeeedOled.putString("\n");
   SeeedOled.putString("Humid: ");
   SeeedOled.putNumber(tempHumVal[0]); //Print the String
-
+  SeeedOled.putString("\t%");
+  
+  SeeedOled.setTextXY(3, -1);
+  SeeedOled.putString("\n");
+  SeeedOled.putString("Moist: ");
+  SeeedOled.putNumber(moistVal); //Print the String
+  SeeedOled.putString("    ");
+  
 
   // Delay and newlines for readability
   Serial.println();
