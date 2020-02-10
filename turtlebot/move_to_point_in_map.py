@@ -1,3 +1,5 @@
+# Copyright (c) 2015, Mark Silliman
+
 import rospy
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import actionlib
