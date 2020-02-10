@@ -23,20 +23,21 @@ def get_pose(txt_file):
     or_found = False
     for i,l in enumerate(lines):
         if ('position' in l):
-            pos_x = re.findall("\d+\.\d+", lines[i+1])
-            pos_y = re.findall("\d+\.\d+", lines[i+2])
+            pos_x = re.findall("[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines[i+1])
+            pos_y = re.findall("[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines[i+2])
             pos_found = True
         if ('orientation' in l):
-            or_x = re.findall("\d+\.\d+", lines[i+1])
-            or_y = re.findall("\d+\.\d+", lines[i+2])
-            or_z = re.findall("\d+\.\d+", lines[i+3])
-            or_w = re.findall("\d+\.\d+", lines[i+4])
+            or_x = re.findall("[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines[i+1])
+            or_y = re.findall("[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines[i+2])
+            or_z = re.findall("[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines[i+3])
+            or_w = re.findall("[-+]?[0-9]*\.?[0-9]+(?:[eE][-+]?[0-9]+)?", lines[i+4])
             or_found = True
         if (pos_found and or_found):
             break
     
     turtlebot_pose = np.asarray(pos_x + pos_y + or_x + or_y + or_z + or_w)
-    np.save('turtlebot_pose.npy', turtlebot_pose)
+    poses = turtlebot_pose.astype(np.float)
+    np.save('turtlebot_pose.npy', poses)
     f.close()
 
 get_pose('pose.txt')
