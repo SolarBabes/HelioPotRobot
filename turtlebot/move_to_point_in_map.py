@@ -25,9 +25,9 @@ class GoToPose():
 
         # Send a goal
         self.goal_sent = True
-	goal = MoveBaseGoal()
-	goal.target_pose.header.frame_id = 'map'
-	goal.target_pose.header.stamp = rospy.Time.now()
+        goal = MoveBaseGoal()
+        goal.target_pose.header.frame_id = 'map'
+        goal.target_pose.header.stamp = rospy.Time.now()
         goal.target_pose.pose = Pose(Point(pos['x'], pos['y'], 0.000),
                                      Quaternion(quat['r1'], quat['r2'], quat['r3'], quat['r4']))
 
