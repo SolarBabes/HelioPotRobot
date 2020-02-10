@@ -25,7 +25,7 @@
 //   If they don't work, try another pin.
 // ===============================================================================
 
-#include <ArduinoJson.h>
+//#include <ArduinoJson.h>
 #include <SeeedOLED.h>
 #include "DHT.h"
 #include "Wire.h"
@@ -34,27 +34,20 @@
 //==============
 // PIN NUMBERS
 //==============          // SENSOR                  // RIBBON COLOUR    
-#define LIGHT_0_PIN  A0   // light sensor 0          // red
-#define LIGHT_1_PIN  A1   // light sensor 1          // orange
-#define LIGHT_2_PIN  A2   // light sensor 2          // yellow
-//#define LIGHT_3_PIN  A5   // light sensor 3        // removed for demo 1!
-#define DHT_PIN      4    // temp & humidity sensor  // green
-#define MOIST_PIN    A3   // moisture sensor         // blue      //<-- this boy likes to draw a whole lot of current
+
+#define DHT_PIN      8    // temp & humidity sensor  // green
+#define MOIST_PIN    A0   // moisture sensor         // blue      //<-- this boy likes to draw a whole lot of current
 
 #define DHTTYPE DHT11   // DHT 11
 DHT dht(DHT_PIN, DHTTYPE);
 
-int   lightVal[3]   = {0};
+
 float tempHumVal[2] = {0}; 
 int   moistVal      = 0;
-int avgLightCurrent = 0;
-int currentMinLight = 0;
-int currentMaxLight = 0;
-int minLight = 0;
 int minTemp  = 0;
 int minHumid = 0;
 int minMoist = 0;
-int maxLight = 0;
+//int maxLight = 0;
 int maxTemp  = 0;
 int maxHumid = 0;
 int maxMoist = 0;
@@ -77,14 +70,8 @@ void loop()
   //PRINT LIVE READINGS
   Serial.println("LIVE READINGS");
   Serial.println("=============");
-  // Print light readings
-  //this sensor's 5V max is 1000lux!
-  //so we map from 0-1023 raw to 0-1000 lux.
-  lightVal[0] = analogRead(LIGHT_0_PIN);
-  lightVal[1] = analogRead(LIGHT_1_PIN);
-  lightVal[2] = analogRead(LIGHT_2_PIN);
-//  lightVal[3] = analogRead(LIGHT_3_PIN);
-  for (int i=0; i<3; i++) {
+
+/*  for (int i=0; i<3; i++) {
     lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
     Serial.print("Light ");
     Serial.print(i);
@@ -93,6 +80,7 @@ void loop()
     Serial.print(" lux\t\t"); 
   }
   Serial.println();
+*/
 
   // Print temp & humidity readings
   if(!dht.readTempAndHumidity(tempHumVal)) {
@@ -140,12 +128,6 @@ void loop()
   }
   Serial.println();
 
-  //PRINT CURRENT AVG LIGHT
-  Serial.println("CURRENT LIGHT AVERAGE");
-  Serial.println("=====================");
-  avgLightCurrent = (lightVal[0] + lightVal[1] + lightVal[2]/* + lightVal[3]*/) / 3;
-  Serial.print(avgLightCurrent);
-  Serial.println(" lux");
 
 
   //PRINT RUNNING MIN AND MAX
@@ -176,12 +158,6 @@ void loop()
 */
 
   //PRINT TO OLED DISPLAY
-  SeeedOled.setNormalDisplay();      //Set display to normal mode (i.e non-inverse mode)
-  SeeedOled.setPageMode();           //Set addressing mode to Page Mode
-  SeeedOled.setTextXY(0, 0);         //Set the cursor to Xth Page, Yth Column
-  SeeedOled.putString("Light: ");
-  SeeedOled.putNumber(avgLightCurrent); //Print the String
-  SeeedOled.putString("\tlux ");
 
   SeeedOled.setTextXY(1, 0);
   SeeedOled.putString("\n");
@@ -209,4 +185,3 @@ void loop()
   delay(1000);
 
 }
-
