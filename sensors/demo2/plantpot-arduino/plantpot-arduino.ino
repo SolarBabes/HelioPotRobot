@@ -25,9 +25,11 @@
 //   If they don't work, try another pin.
 // ===============================================================================
 
+#include <ArduinoJson.h>
 #include <SeeedOLED.h>
 #include "DHT.h"
 #include "Wire.h"
+
 
 //==============
 // PIN NUMBERS
