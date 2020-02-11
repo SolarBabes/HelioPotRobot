@@ -20,9 +20,6 @@
 #include "Wire.h"
 
 
-// {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
-
-
 
 //==============
 // PIN NUMBERS
@@ -45,6 +42,7 @@ int maxMoist = 0;
 
 void setup() 
 {
+  Wire.begin();
   SeeedOled.init();
   SeeedOled.clearDisplay();
   Serial.begin(9600);
@@ -56,15 +54,35 @@ void setup()
 
 void loop() 
 {   
- 
-  // {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
   
   // **OPEN SERIAL MESSAGE**
-  Serial.println("{");
   
   // Print temp & humidity readings
-  Serial.println("\"sensor:\":\"humidity\",\"time\" ");
+  //Serial.println("\"sensor:\":\"humidity\",\"time\" ");
   if(!dht.readTempAndHumidity(tempHumVal)) {
+
+    Serial.print("{\"sensor\":");
+    Serial.print("\"temperature");
+    Serial.print("\"");
+    Serial.print(",");
+    Serial.print("\"time\":");
+    Serial.print(millis());
+    Serial.print(",");
+    Serial.print("\"data\":");
+    Serial.print(tempHumVal[1]);
+    Serial.print("}");
+    Serial.print("\n");
+    Serial.print("{\"sensor\":");
+    Serial.print("\"humidity");
+    Serial.print("\"");
+    Serial.print(",");
+    Serial.print("\"time\":");
+    Serial.print(millis());
+    Serial.print(",");
+    Serial.print("\"data\":");
+    Serial.print(tempHumVal[0]);
+    Serial.print("}");
+    Serial.print("\n");
     
   } 
   else {
@@ -73,46 +91,28 @@ void loop()
 
   // Print moisture readings
   moistVal = analogRead(MOIST_PIN);
-  Serial.print("Moisture: ");
-  Serial.print(moistVal);
-  if (0 <= moistVal && moistVal <150) {
-    Serial.println(" ~ Very dry!");
-  } 
-  else if (150 <= moistVal && moistVal < 300) {
-    Serial.println(" ~ Quite dry.");
-  } 
-  else if (300 <= moistVal && moistVal < 450) {
-    Serial.println(" ~ A bit moist.");
-  } 
-  else if (450 <= moistVal && moistVal < 600) {
-    Serial.println(" ~ Quite moist.");
-  } 
-  else if (600 <= moistVal && moistVal < 700) {
-    Serial.println(" ~ Very moist!");
-  } 
-  else if (700 <= moistVal && moistVal < 825) {
-    Serial.println(" ~ Very moist!");
-  } 
-  else if (825 <= moistVal && moistVal < 950) {
-    Serial.println(" ~ Pretty much just water.");
-  }
+  //Serial.print("Moisture: ");
+  //Serial.print(moistVal);
+
+    Serial.print("{\"sensor\":");
+    Serial.print("\"moisture");
+    Serial.print("\"");
+    Serial.print(",");
+    Serial.print("\"time\":");
+    Serial.print(millis());
+    Serial.print(",");
+    Serial.print("\"data\":");
+    Serial.print(moistVal);
+    Serial.print("}");
+    Serial.print("\n");
+
+
+
   Serial.println();
 
 
 
-  //PRINT RUNNING MIN AND MAX
-  /*
-  Serial.println("RUNNING MIN AND MAX");
-  if (tempHumVal[1] < minTemp) {
-    minTemp = tempHumVal[1];
-  }
-  if (tempHumVal[0] < minHumid ) {
-    minHumid = tempHumVal[0];
-  }
-  if (moistVal < minMoist) {
-    minMoist = moistVal;
-  }
-*/
+
 
   //PRINT TO OLED DISPLAY
   SeeedOled.setTextXY(1, 0);
