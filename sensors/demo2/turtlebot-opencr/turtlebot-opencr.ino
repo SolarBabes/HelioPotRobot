@@ -1,45 +1,27 @@
-
 // ============================================================================
-// SDP 2020 - DEMO 1
+// SDP 2020 - DEMO 2
 // GROUP 1  - SOLARBABES
 // HELIOPOT
 // ===============================================================================
 // Code for showing that sensors give readings in a human-understandable way.
 // !! 
-// NOTE that the moisture sensor will be separated after demo 1, so that the 
-//  separate Arduino for the plant will deal with moisture readings, and the
-//  OpenCR board on the Turtlebot will deal with the humidity&temp (DHT) and
-//  light sensor readings.
-//  This means that this code is only functional for demo 1 and will need major
-//  restructuring for demo 2 and onwards.
 //  The OpenCR board serial output is seen by the Rpi in its /dev
 //  The OpenCR board can run Arduino code and has the same headers on top as Uno
 // ===============================================================================
-// DHT portion originally written by ladyada, public domain
-// Modified and extended by SolarBabes
-// ===============================================================================
-// Remember to connect the signal pin of the DHT sensor through a 10K resistor
-//   to +5V!
-// Also remember that the D in DHT stands for digital! The temp & humidity sensor
-//   can be put in a digital pin!
-// !! The current Uno we have has weird A4 and sometimes (??) A5 pins!!
-//   If they don't work, try another pin.
-// ===============================================================================
 
 #include <SeeedOLED.h>
-#include "DHT.h"
 #include "Wire.h"
 
 //==============
 // PIN NUMBERS
-//==============          // SENSOR                  // RIBBON COLOUR    
-#define LIGHT_0_PIN  A0   // light sensor 0          // red
-#define LIGHT_1_PIN  A1   // light sensor 1          // orange
-#define LIGHT_2_PIN  A2   // light sensor 2          // yellow
-#define LIGHT_3_PIN  A3   // light sensor 3          // green        // removed for demo 1!
+//==============          // SENSOR
+#define LIGHT_0_PIN  A0   // light sensor 0
+#define LIGHT_1_PIN  A1   // light sensor 1
+#define LIGHT_2_PIN  A2   // light sensor 2
+#define LIGHT_3_PIN  A3   // light sensor 3
+#define serialPi Serial
 
-
-int   lightVal[4]   = {0};
+int lightVal[4]   = {0};
 int avgLightCurrent = 0;
 int currentMinLight = 0;
 int currentMaxLight = 0;
@@ -55,8 +37,6 @@ void setup()
   Serial.begin(9600);
   Serial.println("\n<--SERIAL READY-->\n");
   Wire.begin();
-  //dht.begin();
-
 }
 
 void loop() 
@@ -74,23 +54,26 @@ void loop()
   lightVal[3] = analogRead(LIGHT_3_PIN);
   for (int i=0; i<4; i++) {
     lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
-    Serial.print("Light ");
+
+   //{"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
+
+    Serial.print("{\"sensor\":");
+    Serial.print("\"light");
     Serial.print(i);
-    Serial.print(": ");
+    Serial.print("\"");
+    Serial.print(",");
+    Serial.print("\"time\":");
+    Serial.print(millis());
+    Serial.print(",");
+    Serial.print("\"data\":");
     Serial.print(lightVal[i]);
-    Serial.print(" lux\t\t"); 
+    Serial.print("}");
+    Serial.print("\n");
+
   }
   Serial.println();
 
-
-  //PRINT CURRENT AVG LIGHT
-  Serial.println("CURRENT LIGHT AVERAGE");
-  Serial.println("=====================");
-  avgLightCurrent = (lightVal[0] + lightVal[1] + lightVal[2] + lightVal[3]) / 4;
-  Serial.print(avgLightCurrent);
-  Serial.println(" lux");
   
-
   // Delay and newlines for readability
   Serial.println();
   Serial.println();
