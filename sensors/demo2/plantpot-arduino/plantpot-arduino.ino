@@ -1,107 +1,77 @@
 // ============================================================================
-// SDP 2020 - DEMO 1
+// SDP 2020 - DEMO 2
 // GROUP 1  - SOLARBABES
 // HELIOPOT
 // ===============================================================================
-// Code for showing that sensors give readings in a human-understandable way.
-// !! 
-// NOTE that the moisture sensor will be separated after demo 1, so that the 
-//  separate Arduino for the plant will deal with moisture readings, and the
-//  OpenCR board on the Turtlebot will deal with the humidity&temp (DHT) and
-//  light sensor readings.
-//  This means that this code is only functional for demo 1 and will need major
-//  restructuring for demo 2 and onwards.
-//  The OpenCR board serial output is seen by the Rpi in its /dev
+// Code for sending data from the ** Arduino Uno **, via USB, to the Turtlebot RPi
+//  The OpenCR board serial output is seen by the Rpi in its /mnt/
 //  The OpenCR board can run Arduino code and has the same headers on top as Uno
 // ===============================================================================
 // DHT portion originally written by ladyada, public domain
 // Modified and extended by SolarBabes
 // ===============================================================================
-// Remember to connect the signal pin of the DHT sensor through a 10K resistor
-//   to +5V!
-// Also remember that the D in DHT stands for digital! The temp & humidity sensor
+// Remember that the D in DHT stands for digital! The temp & humidity sensor
 //   can be put in a digital pin!
-// !! The current Uno we have has weird A4 and sometimes (??) A5 pins!!
-//   If they don't work, try another pin.
 // ===============================================================================
 
-//#include <ArduinoJson.h>
+
 #include <SeeedOLED.h>
 #include "DHT.h"
 #include "Wire.h"
 
 
+// {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
+
+
+
 //==============
 // PIN NUMBERS
-//==============          // SENSOR                  // RIBBON COLOUR    
+//==============          // SENSOR                      
+#define DHT_PIN      8    // temp & humidity sensor  
+#define MOIST_PIN    A0   // moisture sensor         
 
-#define DHT_PIN      8    // temp & humidity sensor  // green
-#define MOIST_PIN    A0   // moisture sensor         // blue      //<-- this boy likes to draw a whole lot of current
-
-#define DHTTYPE DHT11   // DHT 11
+#define DHTTYPE DHT11     // DHT 11
 DHT dht(DHT_PIN, DHTTYPE);
 
 
 float tempHumVal[2] = {0}; 
-int   moistVal      = 0;
+int moistVal = 0;
 int minTemp  = 0;
 int minHumid = 0;
 int minMoist = 0;
-//int maxLight = 0;
 int maxTemp  = 0;
 int maxHumid = 0;
 int maxMoist = 0;
 
 void setup() 
 {
-  Wire.begin();
-  SeeedOled.init();  //initialze SEEED OLED display
+  SeeedOled.init();
   SeeedOled.clearDisplay();
   Serial.begin(9600);
-  Serial.println("\n<--SERIAL READY-->\n");
+  Serial.println("\n<--SERIAL-READY-->\n");
   Wire.begin();
   dht.begin();
 
 }
 
 void loop() 
-{    
-
-  //PRINT LIVE READINGS
-  Serial.println("LIVE READINGS");
-  Serial.println("=============");
-
-/*  for (int i=0; i<3; i++) {
-    lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
-    Serial.print("Light ");
-    Serial.print(i);
-    Serial.print(": ");
-    Serial.print(lightVal[i]);
-    Serial.print(" lux\t\t"); 
-  }
-  Serial.println();
-*/
-
+{   
+ 
+  // {"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
+  
+  // **OPEN SERIAL MESSAGE**
+  Serial.println("{");
+  
   // Print temp & humidity readings
+  Serial.println("\"sensor:\":\"humidity\",\"time\" ");
   if(!dht.readTempAndHumidity(tempHumVal)) {
-    Serial.print("Humidity: "); 
-    Serial.print(tempHumVal[0]);
-    Serial.print(" %\t");
-    Serial.print("Temperature: "); 
-    Serial.print(tempHumVal[1]);
-    Serial.println(" *C");
+    
   } 
   else {
-    Serial.println("Failed to get temperature and humidity value.");
+    Serial.println();
   }
 
   // Print moisture readings
-  //   Reading temperature or humidity takes about 250 milliseconds!
-  //   Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
-  //  "It is just a value reflect the humidity of soil.We do not standardization.Regards." -Grove FAQ admin
-  //     0-300 dry soil
-  //   300-700 humid soil
-  //   700-950 water
   moistVal = analogRead(MOIST_PIN);
   Serial.print("Moisture: ");
   Serial.print(moistVal);
@@ -133,19 +103,6 @@ void loop()
   //PRINT RUNNING MIN AND MAX
   /*
   Serial.println("RUNNING MIN AND MAX");
-  Serial.println("===================");
-  currentMinLight = min(lightVal[0], min(lightVal[1], min(lightVal[2], lightVal[3])));
-  currentMaxLight = max(lightVal[0], max(lightVal[1], max(lightVal[2], lightVal[3])));
-  
-  if (currentMinLight < minLight) {
-    minLight = currentMinLight;
-  }
-  Serial.print("Minimum light: ");
-  Serial.println(minLight);
-  if (currentMaxLight < maxLight) {
-    maxLight = currentMaxLight;
-  }
-  
   if (tempHumVal[1] < minTemp) {
     minTemp = tempHumVal[1];
   }
@@ -158,7 +115,6 @@ void loop()
 */
 
   //PRINT TO OLED DISPLAY
-
   SeeedOled.setTextXY(1, 0);
   SeeedOled.putString("\n");
   SeeedOled.putString("Temp: ");
