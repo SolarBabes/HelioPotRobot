@@ -49,10 +49,8 @@ def __init__(self):
 
     # Initialize position variable as a Point type
     position = Point()
-
     # Loop once for each leg of the trip
     for i in range(2):
-
         # Initialize the movement command
         move_cmd = Twist()
         # Set the movement command to forward motion
@@ -64,8 +62,7 @@ def __init__(self):
         y_start = position.y
 
         # Keep track of the distance traveled
-        distance = 0
-
+        # distance = 0
         # # Enter the loop to move along a side
         # while distance < goal_distance and not rospy.is_shutdown():
         #     # Publish the Twist message and sleep 1 cycle         
@@ -79,7 +76,6 @@ def __init__(self):
         #     # Compute the Euclidean distance from the start
         #     distance = sqrt(pow((position.x - x_start), 2) + 
         #                     pow((position.y - y_start), 2))
-
 
 
         ### ROTATION
