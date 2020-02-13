@@ -9,7 +9,8 @@ HUMIDITY_STRING = "humidity"
 LIGHT_STRING = "light"
 MOISTURE_STRING = "moisture"
 
-ser = serial.Serial('/dev/ttyACM0', 9600)
+#ser = serial.Serial('/dev/ttyACM0', 9600)
+ser = serial.Serial('/dev/cu.usbmodem14201', 9600)
 
 
 
@@ -18,6 +19,7 @@ def update(name):
             read_serial = ser.readline()
             cookedserial = read_serial.decode('utf-8')
             print (cookedserial)
+            cookedserial = int(''.join([i for i in cookedserial if i in "123456890"]))
             #return cookedserial
             ref.child("realtime").update({name: cookedserial})
             ref.child(name).update({str(round(time.time())): cookedserial})
