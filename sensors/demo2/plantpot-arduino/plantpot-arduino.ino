@@ -46,7 +46,7 @@ void setup()
   SeeedOled.init();
   SeeedOled.clearDisplay();
   Serial.begin(9600);
-  Serial.println("\n<--SERIAL-READY-->\n");
+  //Serial.println("\n<--SERIAL-READY-->\n");
   Wire.begin();
   dht.begin();
 
@@ -61,28 +61,23 @@ void loop()
   //Serial.println("\"sensor:\":\"humidity\",\"time\" ");
   if(!dht.readTempAndHumidity(tempHumVal)) {
 
-    Serial.print("{\"sensor\":");
-    Serial.print("\"temperature");
-    Serial.print("\"");
-    Serial.print(",");
-    Serial.print("\"time\":");
-    Serial.print(millis());
-    Serial.print(",");
-    Serial.print("\"data\":");
+    
+    /*Serial.print("T");
     Serial.print(tempHumVal[1]);
-    Serial.print("}");
+    
     Serial.print("\n");
-    Serial.print("{\"sensor\":");
-    Serial.print("\"humidity");
-    Serial.print("\"");
-    Serial.print(",");
-    Serial.print("\"time\":");
-    Serial.print(millis());
-    Serial.print(",");
-    Serial.print("\"data\":");
+    
+    Serial.print("H");
+    
     Serial.print(tempHumVal[0]);
-    Serial.print("}");
-    Serial.print("\n");
+    
+    Serial.print("\n");*/
+
+    Serial.print("<");
+    Serial.print(tempHumVal[1]);
+    Serial.print(",");
+    Serial.print(tempHumVal[0]);
+    
     
   } 
   else {
@@ -94,21 +89,13 @@ void loop()
   //Serial.print("Moisture: ");
   //Serial.print(moistVal);
 
-    Serial.print("{\"sensor\":");
-    Serial.print("\"moisture");
-    Serial.print("\"");
     Serial.print(",");
-    Serial.print("\"time\":");
-    Serial.print(millis());
-    Serial.print(",");
-    Serial.print("\"data\":");
     Serial.print(moistVal);
-    Serial.print("}");
-    Serial.print("\n");
-
-
-
-  Serial.println();
+    Serial.println(">");
+   /* Serial.print("M");
+    
+    Serial.print(moistVal);
+    Serial.println();*/
 
 
 
@@ -135,9 +122,7 @@ void loop()
   
 
   // Delay and newlines for readability
-  Serial.println();
-  Serial.println();
-  Serial.println();
+  
   delay(1000);
 
 }
