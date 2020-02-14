@@ -129,7 +129,9 @@ def shutdown(self):
 
 
 if __name__ == '__main__':
-try:
-    Calibrate()
-except:
-    rospy.loginfo("Calibration completed.")
+    try:
+        Calibrate()
+    # except:
+    #     rospy.loginfo("Calibration completed.")
+    except rospy.ROSInterruptException:
+        rospy.loginfo("Ctrl-C caught. Quitting")

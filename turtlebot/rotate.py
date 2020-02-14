@@ -4,24 +4,24 @@ from geometry_msgs.msg import Twist
 PI = 3.1415926535897
 
 def rotate():
-    #Start new node
+    # Start new node
     rospy.init_node('robot_cleaner', anonymous=True)
     velocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
     vel_msg = Twist()
 
     # Receiving the user's input
-    print("Let's rotate your robot")
+    print("Rotate your robot")
     speed = input("Input your speed (degrees/sec):")
     angle = input("Type your distance (degrees):")
     clockwise = input("Clockwise?: ") #True or false
 
-    #Converting from angles to radians
+    # Converting from angles to radians
     # speed = 0.1
     # angle = 2.5
     angular_speed = speed*2*PI/360
     relative_angle = angle*2*PI/360
 
-    #We wont use linear components
+    # Not using linear components because rotating in-place
     vel_msg.linear.x=0
     vel_msg.linear.y=0
     vel_msg.linear.z=0
@@ -34,7 +34,8 @@ def rotate():
         vel_msg.angular.z = -abs(angular_speed)
     else:
         vel_msg.angular.z = abs(angular_speed)
-    # Setting the current time for distance calculus
+
+    # Setting the current time to compute angular distance
     t0 = rospy.Time.now().to_sec()
     current_angle = 0
 
@@ -44,7 +45,7 @@ def rotate():
         current_angle = angular_speed*(t1-t0)
 
 
-    #Forcing our robot to stop
+    # Robot in the specified angle, so stop
     vel_msg.angular.z = 0
     velocity_publisher.publish(vel_msg)
     rospy.spin()
@@ -54,4 +55,4 @@ if __name__ == '__main__':
         # Testing our function
         rotate()
     except rospy.ROSInterruptException:
-        pass
+        rospy.loginfo("Ctrl-C caught. Quitting")
