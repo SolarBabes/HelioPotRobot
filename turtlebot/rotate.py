@@ -6,18 +6,18 @@ PI = 3.1415926535897
 def rotate():
     # Start new node
     rospy.init_node('robot_cleaner', anonymous=True)
-    velocity_publisher = rospy.Publisher('/turtle1/cmd_vel', Twist, queue_size=10)
+    velocity_publisher = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
     vel_msg = Twist()
 
-    # Receiving the user's input
-    print("Rotate your robot")
-    speed = input("Input your speed (degrees/sec):")
-    angle = input("Type your distance (degrees):")
-    clockwise = input("Clockwise?: ") #True or false
+    # # Receiving the user's input
+    # print("Rotate your robot")
+    # speed = input("Input your speed (degrees/sec):")
+    # angle = input("Type your distance (degrees):")
+    # clockwise = input("Clockwise?: ") #True or false
 
     # Converting from angles to radians
-    # speed = 0.1
-    # angle = 2.5
+    speed = 60
+    angle = 50
     angular_speed = speed*2*PI/360
     relative_angle = angle*2*PI/360
 
@@ -30,10 +30,7 @@ def rotate():
 
 
     # Checking if our movement is CW or CCW
-    if clockwise:
-        vel_msg.angular.z = -abs(angular_speed)
-    else:
-        vel_msg.angular.z = abs(angular_speed)
+    vel_msg.angular.z = -abs(angular_speed)
 
     # Setting the current time to compute angular distance
     t0 = rospy.Time.now().to_sec()
