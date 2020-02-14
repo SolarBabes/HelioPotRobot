@@ -1,0 +1,8 @@
+prefix=/home/manav/catkin_ws/devel
+
+Name: turtlebot3
+Description: Description of turtlebot3
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

@@ -32,10 +32,8 @@ int maxLight = 0;
 void setup() 
 {
   Wire.begin();
-  SeeedOled.init();  //initialze SEEED OLED display
-  SeeedOled.clearDisplay();
   Serial.begin(9600);
-  Serial.println("\n<--SERIAL READY-->\n");
+  //Serial.println("\n<--SERIAL READY-->\n");
   Wire.begin();
 }
 
@@ -43,8 +41,8 @@ void loop()
 {    
 
   //PRINT LIVE READINGS
-  Serial.println("LIVE READINGS");
-  Serial.println("=============");
+  //Serial.println("LIVE READINGS");
+  //Serial.println("=============");
   // Print light readings
   //this sensor's 5V max is 1000lux!
   //so we map from 0-1023 raw to 0-1000 lux.
@@ -52,11 +50,12 @@ void loop()
   lightVal[1] = analogRead(LIGHT_1_PIN);
   lightVal[2] = analogRead(LIGHT_2_PIN);
   lightVal[3] = analogRead(LIGHT_3_PIN);
-  for (int i=0; i<4; i++) {
-    lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
+  //for (int i=0; i<4; i++) {
+   // lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
 
    //{"sensor":"gps","time":1351824120,"data":[48.756080,2.302038]}
 
+    /*
     Serial.print("{\"sensor\":");
     Serial.print("\"light");
     Serial.print(i);
@@ -69,15 +68,26 @@ void loop()
     Serial.print(lightVal[i]);
     Serial.print("}");
     Serial.print("\n");
+    */
 
-  }
-  Serial.println();
+    
+    Serial.print("<");
+    Serial.print(lightVal[0]);
+    Serial.print(",");
+    Serial.print(lightVal[1]);
+    Serial.print(",");
+    Serial.print(lightVal[2]);
+    Serial.print(",");
+    Serial.print(lightVal[3]);
+    Serial.println(">");
+    
+
+  //}
+  //Serial.println();
 
   
   // Delay and newlines for readability
-  Serial.println();
-  Serial.println();
-  Serial.println();
+
   delay(1000);
 
 }
