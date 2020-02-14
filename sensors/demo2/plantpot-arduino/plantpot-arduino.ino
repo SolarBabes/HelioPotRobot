@@ -46,7 +46,6 @@ void setup()
   SeeedOled.init();
   SeeedOled.clearDisplay();
   Serial.begin(9600);
-  //Serial.println("\n<--SERIAL-READY-->\n");
   Wire.begin();
   dht.begin();
 
@@ -62,16 +61,6 @@ void loop()
   if(!dht.readTempAndHumidity(tempHumVal)) {
 
     
-    /*Serial.print("T");
-    Serial.print(tempHumVal[1]);
-    
-    Serial.print("\n");
-    
-    Serial.print("H");
-    
-    Serial.print(tempHumVal[0]);
-    
-    Serial.print("\n");*/
 
     Serial.print("<");
     Serial.print(tempHumVal[1]);
@@ -86,16 +75,12 @@ void loop()
 
   // Print moisture readings
   moistVal = analogRead(MOIST_PIN);
-  //Serial.print("Moisture: ");
-  //Serial.print(moistVal);
+  
 
     Serial.print(",");
     Serial.print(moistVal);
     Serial.println(">");
-   /* Serial.print("M");
-    
-    Serial.print(moistVal);
-    Serial.println();*/
+ 
 
 
 
