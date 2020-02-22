@@ -15,8 +15,8 @@ ser = serial.Serial('/dev/cu.usbmodem14201', 9600) #just for azam's laptop
 cred = credentials.Certificate('serviceAccountKey.json')
 firebase_admin.initialize_app(cred, {'databaseURL': 'https://solarbabesdb.firebaseio.com/'})
 
-plantName = "plant2"  # TODO change here for robot name
-ref = db.reference('bot/'+plantName)
+plantName = "0001"  # TODO change here for robot name
+ref = db.reference('heliopots/'+plantName+'/data')
 
 
 def sensor_reading():
