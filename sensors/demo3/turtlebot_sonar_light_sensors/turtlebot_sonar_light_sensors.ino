@@ -1,3 +1,5 @@
+#include <LiquidCrystal.h>
+
 //ROS THINGS
 /*
 #include <ros.h>
@@ -25,11 +27,15 @@ namespace sonar {
 
 long duration;
 float distance;
+char chr_dist[4];
+
+sonar::Cluster front;
+sonar::Cluster back;
+
+// Set up light pins
+
 
 void setup() {
-  
-    sonar::Cluster front;
-    sonar::Cluster back;
     
   // Set up pin numbers for FRONT cluster
     front.left.trig = 8;
@@ -40,12 +46,12 @@ void setup() {
     front.right.echo = 7;
     
   // Set up pin numbers for BACK cluster
-    //back.left.trig = ;
-    //back.left.echo = ;
+    back.left.trig = 12;
+    back.left.echo = 13;
     back.middle.trig = 2;
     back.middle.echo = 3;
-    //back.right.trig = ;
-    //back.right.echo = ;
+    back.right.trig = 10;
+    back.right.echo = 11;
 
   // Set up pin modes
     pinMode(front.left.trig, OUTPUT);
@@ -62,10 +68,11 @@ void setup() {
     pinMode(back.right.echo, INPUT);
     
     Serial.begin(9600); //REMEMBER TO CHANGE FOR ROS!!
+    Serial.println("\n<--SERIAL READY-->\n");
 }
 
 
-long publishDistance(HC_SR04::Usound &sensor) { // CHANGE TO VOID FOR ROS
+void publishDistance(HC_SR04::Usound &sensor) { // CHANGE TO VOID FOR ROS
   // Clear trig pin
   digitalWrite(sensor.trig, LOW);
   delayMicroseconds(2);
@@ -76,7 +83,7 @@ long publishDistance(HC_SR04::Usound &sensor) { // CHANGE TO VOID FOR ROS
   digitalWrite(sensor.trig, LOW);
   
   // Read echo pin, calculate distance
-  duration = pulseIn(sensor.echo, HIGH);
+  duration = pulseIn(sensor.echo, HIGH); //30ms timeout
   distance = duration * 0.034/2;
   
 // ROS PUBLISH CODE
@@ -86,16 +93,40 @@ chatter.publish(&Distance);
 nh.spinOnce(); 
  */
 
-
 //Print to serial monitor
   Serial.print("Distance: ");
   Serial.println(distance);
   delay(100);
-  
 }
  
 void loop() {
-    //Get distances
-    
+    //Get distances and print em
+    Serial.println("SONAR READINGS");
+    Serial.println("=============");
+    Serial.println("FRONT");
+    Serial.print("\tleft:\t");
+    publishDistance(front.left);
+    Serial.print("\tmiddle:\t");
+    publishDistance(front.middle);
+    Serial.print("\tright:\t");
+    publishDistance(front.right);
+    Serial.println();
+    Serial.println("BACK");
+    Serial.print("\tright:\t");
+    publishDistance(back.right);
+    Serial.print("\tmiddle:\t");
+    publishDistance(back.middle);
+    Serial.print("\tleft:\t");
+    publishDistance(back.left);
+    Serial.println();
+    Serial.println();
+    Serial.println();
 
-}
+    // Delay and newlines for readability
+    Serial.println();
+    Serial.println();
+    Serial.println();
+    delay(1000);
+  }
+
+    
