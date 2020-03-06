@@ -1,4 +1,5 @@
-#include <LiquidCrystal.h>
+#include <SI114X.h>
+#include <Wire.h>
 
 //ROS THINGS
 /*
@@ -32,7 +33,8 @@ char chr_dist[4];
 sonar::Cluster front;
 sonar::Cluster back;
 
-// Set up light pins
+// Sunlight sensor in shield I2C port
+SI114X SI1145 = SI114X();
 
 
 void setup() {
@@ -67,8 +69,13 @@ void setup() {
     pinMode(back.right.trig, OUTPUT);
     pinMode(back.right.echo, INPUT);
     
-    Serial.begin(9600); //REMEMBER TO CHANGE FOR ROS!!
+    Serial.begin(115200); //REMEMBER TO CHANGE FOR ROS!!
     Serial.println("\n<--SERIAL READY-->\n");
+    while (!SI1145.Begin()) {
+      Serial.println("Si1145 is not ready!");
+      delay(1000);
+    }
+    Serial.println("Si1145 is ready!");
 }
 
 
@@ -83,7 +90,7 @@ void publishDistance(HC_SR04::Usound &sensor) { // CHANGE TO VOID FOR ROS
   digitalWrite(sensor.trig, LOW);
   
   // Read echo pin, calculate distance
-  duration = pulseIn(sensor.echo, HIGH); //30ms timeout
+  duration = pulseIn(sensor.echo, HIGH);
   distance = duration * 0.034/2;
   
 // ROS PUBLISH CODE
@@ -121,6 +128,13 @@ void loop() {
     Serial.println();
     Serial.println();
     Serial.println();
+
+
+    //Get light readings
+    Serial.print("Vis: "); Serial.println(SI1145.ReadVisible());
+    Serial.print("IR: "); Serial.println(SI1145.ReadIR());
+    //the real UV value must be div 100 from the reg value , datasheet for more information.
+    Serial.print("UV: ");  Serial.println((float)SI1145.ReadUV()/100);
 
     // Delay and newlines for readability
     Serial.println();
