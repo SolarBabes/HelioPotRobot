@@ -1,11 +1,12 @@
 #include <SI114X.h>
+#include <SI114X_softi2c.h>
+#include <SoftwareI2C.h>
 #include <Wire.h>
 
 //ROS THINGS
 /*
 #include <ros.h>
 #include <std_msgs/Float64.h>
-
 ros::NodeHandle nh;
 std_msgs::Float64 Distance;
 ros::Publisher chatter("chatter",&Distance);
@@ -142,5 +143,3 @@ void loop() {
     Serial.println();
     delay(1000);
   }
-
-    
