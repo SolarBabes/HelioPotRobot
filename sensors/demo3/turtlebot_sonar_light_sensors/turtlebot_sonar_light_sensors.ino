@@ -1,9 +1,24 @@
+// If this is your first time running this sketch, make sure to do the following:
+// Sketch -> Include library -> Add .ZIP library...
+//  for HelioPotRobot/sensors/lib
+//                               /Arduino_Software_I2C-master.zip
+//                               /Arduino_Software_I2C-softi2c_branch.zip
+//                               /Grove_Sunlight_Sensor-master.zip
+
+// sunlight sensors' I2C address is 0x60
+
+
+//#######################
+// INCLUDES
+//#######################
+
 #include <SI114X.h>
-#include <SI114X_softi2c.h>
-#include <SoftwareI2C.h>
 #include <Wire.h>
 
-//ROS THINGS
+
+//#######################
+// ROS THINGS
+//#######################
 /*
 #include <ros.h>
 #include <std_msgs/Float64.h>
@@ -11,6 +26,11 @@ ros::NodeHandle nh;
 std_msgs::Float64 Distance;
 ros::Publisher chatter("chatter",&Distance);
  */
+
+
+//#######################
+// GLOBALS
+//#######################
 
 namespace HC_SR04 {
   typedef struct {
@@ -31,12 +51,19 @@ long duration;
 float distance;
 char chr_dist[4];
 
+
+// Ultrasound sensors
 sonar::Cluster front;
 sonar::Cluster back;
 
-// Sunlight sensor in shield I2C port
-SI114X SI1145 = SI114X();
+// Sunlight sensors in shield I2C port
+SI114X sunS0         = SI114X();          // real I2C     SDA-SCL   (Grove I2C)
 
+
+
+//#######################
+// SETUP
+//#######################
 
 void setup() {
     
@@ -72,13 +99,20 @@ void setup() {
     
     Serial.begin(115200); //REMEMBER TO CHANGE FOR ROS!!
     Serial.println("\n<--SERIAL READY-->\n");
-    while (!SI1145.Begin()) {
-      Serial.println("Si1145 is not ready!");
+    
+    while (!sunS0.Begin()) {
+      Serial.println("sunS0 not ready...");
       delay(1000);
     }
-    Serial.println("Si1145 is ready!");
+
+    
+    Serial.println("sunlight sensors are ready! (?)");
 }
 
+
+//#######################
+// FUNCTIONS
+//#######################
 
 void publishDistance(HC_SR04::Usound &sensor) { // CHANGE TO VOID FOR ROS
   // Clear trig pin
@@ -106,11 +140,16 @@ nh.spinOnce();
   Serial.println(distance);
   delay(100);
 }
- 
+
+
+//#######################
+// LOOP
+//#######################
+
 void loop() {
     //Get distances and print em
     Serial.println("SONAR READINGS");
-    Serial.println("=============");
+    Serial.println("==============");
     Serial.println("FRONT");
     Serial.print("\tleft:\t");
     publishDistance(front.left);
@@ -132,10 +171,24 @@ void loop() {
 
 
     //Get light readings
-    Serial.print("Vis: "); Serial.println(SI1145.ReadVisible());
-    Serial.print("IR: "); Serial.println(SI1145.ReadIR());
-    //the real UV value must be div 100 from the reg value , datasheet for more information.
-    Serial.print("UV: ");  Serial.println((float)SI1145.ReadUV()/100);
+    Serial.println("SUNLIGHT SENSOR READINGS");
+    Serial.println("========================");
+    Serial.println("S0:");
+      Serial.print("\tVis:\t"); Serial.println(sunS0.ReadVisible());
+      Serial.print("\tIR:\t"); Serial.println(sunS0.ReadIR());
+      Serial.print("\tUV:\t");  Serial.println((float)sunS0.ReadUV()/100); // see datasheet for div 100
+//    Serial.println("S1:");
+//      Serial.print("\tVis:\t"); Serial.println(sunS1.ReadVisible());
+//     Serial.print("\tIR:\t"); Serial.println(sunS1.ReadIR());
+//      Serial.print("\tUV:\t");  Serial.println((float)sunS1.ReadUV()/100); // see datasheet for div 100
+//    Serial.println("S2:");
+//      Serial.print("\tVis:\t"); Serial.println(sunS2.ReadVisible());
+//      Serial.print("\tIR:\t"); Serial.println(sunS2.ReadIR());
+//      Serial.print("\tUV:\t");  Serial.println((float)sunS2.ReadUV()/100); // see datasheet for div 100
+//    Serial.println("S3:");
+//      Serial.print("\tVis:\t"); Serial.println(sunS3.ReadVisible());
+//      Serial.print("\tIR:\t"); Serial.println(sunS3.ReadIR());
+//      Serial.print("\tUV:\t");  Serial.println((float)sunS3.ReadUV()/100); // see datasheet for div 100
 
     // Delay and newlines for readability
     Serial.println();
