@@ -1,11 +1,41 @@
 // If this is your first time running this sketch, make sure to do the following:
 // Sketch -> Include library -> Add .ZIP library...
 //  for HelioPotRobot/sensors/lib
-//                               /Arduino_Software_I2C-master.zip
-//                               /Arduino_Software_I2C-softi2c_branch.zip
+//                               /Arduino_Software_I2C-multi2c_branch.zip
 //                               /Grove_Sunlight_Sensor-master.zip
 
-// sunlight sensors' I2C address is 0x60
+
+// sensor sunS1 : 0x10
+// sensor sunS2 : 0x20
+// sensor sunS3 : 0x30
+// sensor sunS4 : 0x40
+
+
+// READ THE BELOW INSTRUCTIONS CAREFULLY!!
+
+// 0. Find the three lines in setup() with the commented arrows pointing at them.
+//      Remember these - they are the lines where you need to change variables
+//      each time you set up each sensor.
+
+// 1. Plug ONE sunlight sensor into the Arduino. This will be sensor 1 (sunS1).
+// 2. Ensure that the three lines in setup() are referring to sunS1 and 0x10.   
+//      (of course, only the object reference and numerical value parameters have an actual
+//       effect, but if you also change the printed lines accordingly you will save yourself
+//       a lot of grief) 
+// 3. Upload the sketch, open the serial monitor and confirm that the address change
+//      has happened.
+// 4. Close the serial monitor, add the next sensor to the board (don't touch any
+//      previously set up sensor!)
+// 5. Repeat these steps, changing the variables in the three lines in setup() according
+//      to what sensor you are setting up.
+
+// If you have done all of this successfully, all four sensors should be printing sensible
+//      sunlight readings together in the serial monitor!
+
+
+
+// IF YOU UNPLUG ANY SENSOR OR THE ARDUINO USB AT ANY POINT, YOU NEED TO START FROM THE BEGINNING
+//    AND DO IT ALL AGAIN!!
 
 
 //#######################
@@ -56,10 +86,14 @@ char chr_dist[4];
 sonar::Cluster front;
 sonar::Cluster back;
 
-// Sunlight sensors in shield I2C port
-SI114X sunS0         = SI114X();          // real I2C     SDA-SCL   (Grove I2C)
+// Sunlight sensors in shield I2C ports
+SI114X sunS1 = SI114X(0x10);
+SI114X sunS2 = SI114X(0x20);
+SI114X sunS3 = SI114X(0x30);
+SI114X sunS4 = SI114X(0x40);
 
-
+uint8_t confirmAddress;
+bool sunSensorConfirm = true;
 
 //#######################
 // SETUP
@@ -99,14 +133,13 @@ void setup() {
     
     Serial.begin(115200); //REMEMBER TO CHANGE FOR ROS!!
     Serial.println("\n<--SERIAL READY-->\n");
-    
-    while (!sunS0.Begin()) {
-      Serial.println("sunS0 not ready...");
-      delay(1000);
-    }
 
+    Serial.println("Setting up sunS4 with address 0x40...");   // <----------  CHANGE EACH TIME YOU RUN! SEE TOP OF FILE
+    confirmAddress = setUpSunlightSensor(&sunS4, 0x40);        // <----------  CHANGE EACH TIME YOU RUN! SEE TOP OF FILE
+    Serial.print("sunS4 address is now ");                     // <----------  CHANGE EACH TIME YOU RUN! SEE TOP OF FILE
+    Serial.println(confirmAddress);
+    Serial.println();
     
-    Serial.println("sunlight sensors are ready! (?)");
 }
 
 
@@ -142,6 +175,24 @@ nh.spinOnce();
 }
 
 
+uint8_t setUpSunlightSensor(SI114X *sensor, uint8_t newAddr) {
+  // if sensor responds to default addr...change its addr
+  if (sensor->Begin(0x60)) {
+    sensor->SetNewSlaveAddress(0x60, newAddr);
+  // otherwise it should already be listening to its newAddr
+  //  ...but it could still have a bad internal addr of 255, so reset and fix that
+  } else if (sensor->Begin(newAddr)) {
+    if (sensor->ReadParamData(newAddr, 0x00) == 255) {
+      sensor->Reset(0xFF);
+      sensor->Begin(0x60);
+      sunS1.SetNewSlaveAddress(0x60, newAddr);
+    }
+  }
+  
+  return sensor->ReadParamData(newAddr, 0x00);
+}
+
+
 //#######################
 // LOOP
 //#######################
@@ -173,26 +224,26 @@ void loop() {
     //Get light readings
     Serial.println("SUNLIGHT SENSOR READINGS");
     Serial.println("========================");
-    Serial.println("S0:");
-      Serial.print("\tVis:\t"); Serial.println(sunS0.ReadVisible());
-      Serial.print("\tIR:\t"); Serial.println(sunS0.ReadIR());
-      Serial.print("\tUV:\t");  Serial.println((float)sunS0.ReadUV()/100); // see datasheet for div 100
-//    Serial.println("S1:");
-//      Serial.print("\tVis:\t"); Serial.println(sunS1.ReadVisible());
-//     Serial.print("\tIR:\t"); Serial.println(sunS1.ReadIR());
-//      Serial.print("\tUV:\t");  Serial.println((float)sunS1.ReadUV()/100); // see datasheet for div 100
-//    Serial.println("S2:");
-//      Serial.print("\tVis:\t"); Serial.println(sunS2.ReadVisible());
-//      Serial.print("\tIR:\t"); Serial.println(sunS2.ReadIR());
-//      Serial.print("\tUV:\t");  Serial.println((float)sunS2.ReadUV()/100); // see datasheet for div 100
-//    Serial.println("S3:");
-//      Serial.print("\tVis:\t"); Serial.println(sunS3.ReadVisible());
-//      Serial.print("\tIR:\t"); Serial.println(sunS3.ReadIR());
-//      Serial.print("\tUV:\t");  Serial.println((float)sunS3.ReadUV()/100); // see datasheet for div 100
+    Serial.println("S1:");
+      Serial.print("\tVis:\t"); Serial.println(sunS1.ReadVisible());
+      Serial.print("\tIR:\t"); Serial.println(sunS1.ReadIR());
+      Serial.print("\tUV:\t");  Serial.println((float)sunS1.ReadUV()/100); // see datasheet for div 100
+    Serial.println("S2:");
+      Serial.print("\tVis:\t"); Serial.println(sunS2.ReadVisible());
+      Serial.print("\tIR:\t"); Serial.println(sunS2.ReadIR());
+      Serial.print("\tUV:\t");  Serial.println((float)sunS2.ReadUV()/100); // see datasheet for div 100
+    Serial.println("S3:");
+      Serial.print("\tVis:\t"); Serial.println(sunS3.ReadVisible());
+      Serial.print("\tIR:\t"); Serial.println(sunS3.ReadIR());
+      Serial.print("\tUV:\t");  Serial.println((float)sunS3.ReadUV()/100); // see datasheet for div 100
+    Serial.println("S4:");
+      Serial.print("\tVis:\t"); Serial.println(sunS4.ReadVisible());
+      Serial.print("\tIR:\t"); Serial.println(sunS4.ReadIR());
+      Serial.print("\tUV:\t");  Serial.println((float)sunS4.ReadUV()/100); // see datasheet for div 100
 
     // Delay and newlines for readability
     Serial.println();
     Serial.println();
     Serial.println();
-    delay(1000);
+    delay(3000);
   }
