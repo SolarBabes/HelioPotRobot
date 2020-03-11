@@ -39,11 +39,16 @@
 
 
 //#######################
-// INCLUDES
+// PREPROCESSING
 //#######################
 
 #include <SI114X.h>
 #include <Wire.h>
+
+#define LIGHT_0_PIN A0
+#define LIGHT_1_PIN A1
+#define LIGHT_2_PIN A2
+#define LIGHT_3_PIN A3
 
 
 //#######################
@@ -91,6 +96,14 @@ SI114X sunS1 = SI114X(0x10);
 SI114X sunS2 = SI114X(0x20);
 SI114X sunS3 = SI114X(0x30);
 SI114X sunS4 = SI114X(0x40);
+
+// Sunlight averages
+int avgVis, avgIR;
+float avgUV;
+
+// Phidgets light sensors for testing
+int lightVal[4];
+int avgLightCurrent = 0;
 
 uint8_t confirmAddress;
 bool sunSensorConfirm = true;
@@ -192,6 +205,22 @@ uint8_t setUpSunlightSensor(SI114X *sensor, uint8_t newAddr) {
   return sensor->ReadParamData(newAddr, 0x00);
 }
 
+void printSunlightReadings(SI114X *sensor, int &Vis, int &IR, float &UV) {
+
+  Vis = sensor->ReadVisible();
+  Serial.print("\tVis:\t"); Serial.println(Vis);
+
+  IR = sensor->ReadIR();
+  Serial.print("\tIR:\t"); Serial.println(IR);
+
+  UV = (float) sensor->ReadUV() / 100;
+  Serial.print("\tUV:\t"); Serial.println(UV);
+
+  avgVis += Vis;
+  avgIR  += IR;
+  avgUV  += UV;
+}
+
 
 //#######################
 // LOOP
@@ -199,48 +228,81 @@ uint8_t setUpSunlightSensor(SI114X *sensor, uint8_t newAddr) {
 
 void loop() {
     //Get distances and print em
-    Serial.println("SONAR READINGS");
-    Serial.println("==============");
-    Serial.println("FRONT");
-    Serial.print("\tleft:\t");
-    publishDistance(front.left);
-    Serial.print("\tmiddle:\t");
-    publishDistance(front.middle);
-    Serial.print("\tright:\t");
-    publishDistance(front.right);
-    Serial.println();
-    Serial.println("BACK");
-    Serial.print("\tright:\t");
-    publishDistance(back.right);
-    Serial.print("\tmiddle:\t");
-    publishDistance(back.middle);
-    Serial.print("\tleft:\t");
-    publishDistance(back.left);
-    Serial.println();
-    Serial.println();
-    Serial.println();
+//    Serial.println("SONAR READINGS");
+//    Serial.println("==============");
+//    Serial.println("FRONT");
+//    Serial.print("\tleft:\t");
+//    publishDistance(front.left);
+//    Serial.print("\tmiddle:\t");
+//    publishDistance(front.middle);
+//    Serial.print("\tright:\t");
+//    publishDistance(front.right);
+//    Serial.println();
+//    Serial.println("BACK");
+//    Serial.print("\tright:\t");
+//    publishDistance(back.right);
+//    Serial.print("\tmiddle:\t");
+//    publishDistance(back.middle);
+//   Serial.print("\tleft:\t");
+//    publishDistance(back.left);
+//    Serial.println();
+//    Serial.println();
+//    Serial.println();
 
 
-    //Get light readings
+    //Get sunlight readings
     Serial.println("SUNLIGHT SENSOR READINGS");
     Serial.println("========================");
-    Serial.println("S1:");
-      Serial.print("\tVis:\t"); Serial.println(sunS1.ReadVisible());
-      Serial.print("\tIR:\t"); Serial.println(sunS1.ReadIR());
-      Serial.print("\tUV:\t");  Serial.println((float)sunS1.ReadUV()/100); // see datasheet for div 100
-    Serial.println("S2:");
-      Serial.print("\tVis:\t"); Serial.println(sunS2.ReadVisible());
-      Serial.print("\tIR:\t"); Serial.println(sunS2.ReadIR());
-      Serial.print("\tUV:\t");  Serial.println((float)sunS2.ReadUV()/100); // see datasheet for div 100
-    Serial.println("S3:");
-      Serial.print("\tVis:\t"); Serial.println(sunS3.ReadVisible());
-      Serial.print("\tIR:\t"); Serial.println(sunS3.ReadIR());
-      Serial.print("\tUV:\t");  Serial.println((float)sunS3.ReadUV()/100); // see datasheet for div 100
-    Serial.println("S4:");
-      Serial.print("\tVis:\t"); Serial.println(sunS4.ReadVisible());
-      Serial.print("\tIR:\t"); Serial.println(sunS4.ReadIR());
-      Serial.print("\tUV:\t");  Serial.println((float)sunS4.ReadUV()/100); // see datasheet for div 100
+    int Vis, IR = 0;
+    float UV = 0;
+    printSunlightReadings(&sunS1, Vis, IR, UV);
+    Serial.println();
+    printSunlightReadings(&sunS2, Vis, IR, UV);
+    Serial.println();
+    printSunlightReadings(&sunS3, Vis, IR, UV);
+    Serial.println();
+    printSunlightReadings(&sunS4, Vis, IR, UV);
+    Serial.println();
+    avgVis /= 4;
+    avgIR /= 4;
+    avgUV /= 4;
+    Serial.println("Current sunlight average:");
+    Serial.print("\t\t\tavgVis:\t"); Serial.println(avgVis);
+    Serial.print("\t\t\tavgIR:\t");  Serial.println(avgIR);
+    Serial.print("\t\t\tavgUV:\t");  Serial.println(avgUV);
+    avgVis = 0;
+    avgIR = 0;
+    avgUV = 0;
+    Serial.println();
+    Serial.println();
 
+    //Get phidgets light readings
+    Serial.println("PHIDGETS READINGS");
+    Serial.println("=============");
+    // Print light readings
+    lightVal[0] = analogRead(LIGHT_0_PIN);
+    lightVal[1] = analogRead(LIGHT_1_PIN);
+    lightVal[2] = analogRead(LIGHT_2_PIN);
+    lightVal[3] = analogRead(LIGHT_3_PIN);
+    for (int i=0; i<4; i++) {
+       lightVal[i] = map(lightVal[i], 0, 1023, 0, 1000);
+      Serial.print("Light ");
+      Serial.print(i);
+      Serial.print(": ");
+      Serial.print(lightVal[i]);
+      Serial.print(" lux\t\t"); 
+    }
+    Serial.println();
+    Serial.println();
+    Serial.print("Current Phidgets average:\t");
+    avgLightCurrent = (lightVal[0] + lightVal[1] + lightVal[2] + lightVal[3]) / 4;
+    Serial.print(avgLightCurrent);
+    Serial.println(" lux");
+
+
+
+
+  
     // Delay and newlines for readability
     Serial.println();
     Serial.println();
