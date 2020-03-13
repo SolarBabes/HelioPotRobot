@@ -147,9 +147,9 @@ void setup() {
     Serial.begin(115200); //REMEMBER TO CHANGE FOR ROS!!
     Serial.println("\n<--SERIAL READY-->\n");
 
-    Serial.println("Setting up sunS4 with address 0x40...");   // <----------  CHANGE EACH TIME YOU RUN! SEE TOP OF FILE
-    confirmAddress = setUpSunlightSensor(&sunS4, 0x40);        // <----------  CHANGE EACH TIME YOU RUN! SEE TOP OF FILE
-    Serial.print("sunS4 address is now ");                     // <----------  CHANGE EACH TIME YOU RUN! SEE TOP OF FILE
+    Serial.println("Setting up sunS1 with address 0x10...");   // <----------  CHANGE EACH TIME YOU RUN! SEE TOP OF FILE
+    confirmAddress = setUpSunlightSensor(&sunS1, 0x10);        // <----------  CHANGE EACH TIME YOU RUN! SEE TOP OF FILE
+    Serial.print("sunS1 address is now ");                     // <----------  CHANGE EACH TIME YOU RUN! SEE TOP OF FILE
     Serial.println(confirmAddress);
     Serial.println();
     
@@ -205,6 +205,7 @@ uint8_t setUpSunlightSensor(SI114X *sensor, uint8_t newAddr) {
   return sensor->ReadParamData(newAddr, 0x00);
 }
 
+
 void printSunlightReadings(SI114X *sensor, int &Vis, int &IR, float &UV) {
 
   Vis = sensor->ReadVisible();
@@ -253,7 +254,7 @@ void loop() {
     //Get sunlight readings
     Serial.println("SUNLIGHT SENSOR READINGS");
     Serial.println("========================");
-    int Vis, IR = 0;
+    int Vis, corVis, IR = 0;
     float UV = 0;
     printSunlightReadings(&sunS1, Vis, IR, UV);
     Serial.println();
@@ -270,9 +271,6 @@ void loop() {
     Serial.print("\t\t\tavgVis:\t"); Serial.println(avgVis);
     Serial.print("\t\t\tavgIR:\t");  Serial.println(avgIR);
     Serial.print("\t\t\tavgUV:\t");  Serial.println(avgUV);
-    avgVis = 0;
-    avgIR = 0;
-    avgUV = 0;
     Serial.println();
     Serial.println();
 
@@ -298,14 +296,33 @@ void loop() {
     avgLightCurrent = (lightVal[0] + lightVal[1] + lightVal[2] + lightVal[3]) / 4;
     Serial.print(avgLightCurrent);
     Serial.println(" lux");
+    Serial.println();
+    Serial.println();
+
+  // Trying out mapping functions
+    Serial.println("SUNLIGHT VALUE FUNCTIONS");
+    Serial.println("=========================");
+
+  // remove offset from vis 
+    corVis = Vis - 260;
+    Serial.print("corVis:\t\t"); Serial.println(corVis);
+
+  // simple addition 
+    Serial.print("Vis + IR:\t"); Serial.println(avgVis + avgIR);
+
+  // weighted average aVis + bIR
+    int a = 100;
+    float b = 1.2;
+    Serial.print("a*corVis + b*IR:\t"); Serial.println(a*corVis + b*IR);
 
 
-
-
+    // reset globvars!!!!!!!!
+    avgVis = 0;
+    avgIR = 0;
+    avgUV = 0;
   
     // Delay and newlines for readability
     Serial.println();
-    Serial.println();
-    Serial.println();
+
     delay(3000);
   }
