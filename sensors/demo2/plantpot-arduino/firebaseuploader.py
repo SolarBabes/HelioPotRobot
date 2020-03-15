@@ -9,14 +9,14 @@ HUMIDITY_STRING = "humidity"
 LIGHT_STRING = "light"
 MOISTURE_STRING = "moisture"
 
-#ser = serial.Serial('/dev/ttyACM0', 9600) #uncomment for raspberry pi
-ser = serial.Serial('/dev/cu.usbmodem14201', 9600) #just for azam's laptop
+ser = serial.Serial('/dev/ttyACM0', 9600) #uncomment for raspberry pi
+#ser = serial.Serial('/dev/cu.usbmodem14201', 9600) #just for azam's laptop
 
 cred = credentials.Certificate('serviceAccountKey.json')
 firebase_admin.initialize_app(cred, {'databaseURL': 'https://solarbabesdb.firebaseio.com/'})
 
-plantName = "plant2"  # TODO change here for robot name
-ref = db.reference('bot/'+plantName)
+plantName = "0001"  # TODO change here for robot name
+ref = db.reference('heliopots/'+plantName+'/data')
 
 
 def sensor_reading():
@@ -25,7 +25,7 @@ def sensor_reading():
            cookedserial = read_serial.decode('utf-8').strip("\r\n ' '")
            datasplit = cookedserial.split(",")
            temperature = int(round(float(datasplit[0].strip('<'))))
-           humidity = int(round(float(datasplit[1]))))
+           humidity = int(round(float(datasplit[1])))
            moisture = int(round(float(datasplit[2].strip('>'))))
            update(TEMPERATURE_STRING, temperature)
            update(HUMIDITY_STRING, humidity)
