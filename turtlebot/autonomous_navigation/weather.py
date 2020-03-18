@@ -9,14 +9,14 @@ import geocoder
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
-global goToBase
+global go_to_base
 
 sched = BackgroundScheduler()
 
 @sched.scheduled_job('interval', minutes=60)
 def getWeather():
     
-    global goToBase
+    global go_to_base
     # get location
     g = geocoder.ip('me')
 
@@ -51,9 +51,9 @@ def getWeather():
         sunHasSet = True
 
     if not sunHasSet and not cloudy and not atmosphere:
-        goToBase = False
+        go_to_base = False
     else:
-        goToBase = True
+        go_to_base = True
 
 sched.start()
 

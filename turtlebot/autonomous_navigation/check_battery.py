@@ -29,6 +29,7 @@ def compute_distance(origin_x, origin_y, dest_x, dest_y):
 
 # Get battery voltage
 def battery_callback(msg):
+    global voltage
     rospy.loginfo("Listening to battery")
     voltage = round(msg.voltage, 2)
 
@@ -55,3 +56,5 @@ while(1):
         go_to_base = True
     elif voltage < 11.30:
         go_to_base = True
+    else:
+        go_to_base = False
